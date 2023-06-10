@@ -1,30 +1,30 @@
-//type alias, using keyword type
-type Combinable = number | string;
-type ConversionDescriptor = "as-number" | "as-text";
-
-function combine(
-  input1: Combinable,
-  input2: Combinable,
-  resultConversion: ConversionDescriptor
-) {
-  let result;
-  if (
-    (typeof input1 === "number" && typeof input2 === "number") ||
-    resultConversion === "as-number"
-  ) {
-    result = +input1 + +input2;
-  } else {
-    result = input1.toString() + input2.toString();
-  }
-
-  return result;
+// let typescript infer the return type rather
+// rather than setting it yourself, if u dont have too
+function add(n1: number, n2: number) {
+  return n1 + n2;
 }
 
-const combinedAges = combine(30, 26, "as-number");
-console.log(combinedAges);
+// Typescript can use the void type like other languages
+// use void if the funxtion return nothing
+// if u use undefined, typescript expects you to return something of type undefined
+function printResult(num: number): void {
+  console.log("Result: " + num);
+}
 
-const combinedStringAges = combine("30", "26", "as-number");
-console.log(combinedStringAges);
+printResult(add(5, 12));
 
-const combinedName = combine("max", "anna", "as-text");
-console.log(combinedName);
+// can declare variables of type function
+// this means that only functions can be stored in the varibale.
+// let combinedValues: Function;
+
+// we use arrow function syntax to be more specifc on what function type
+// we want the varibale to take.
+// in this case we want combined values to only take a function wit a
+// return type of number and 2 number parameters.
+let combinedValues: (a: number, b: number) => number;
+
+combinedValues = add;
+//combinedValues = printResult;
+//combinedValues = 6;
+
+console.log(combinedValues(8, 8));
