@@ -1,6 +1,6 @@
 // let typescript infer the return type rather
 // rather than setting it yourself, if u dont have too
-function add(n1: number, n2: number) {
+function add1(n1: number, n2: number) {
   return n1 + n2;
 }
 
@@ -17,7 +17,7 @@ function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
   cb(result);
 }
 
-printResult(add(5, 12));
+printResult(add1(5, 12));
 
 // can declare variables of type function
 // this means that only functions can be stored in the varibale.

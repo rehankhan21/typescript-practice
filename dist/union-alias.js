@@ -16,3 +16,4 @@ const combinedStringAges = combine("30", "26", "as-number");
 console.log(combinedStringAges);
 const combinedName = combine("max", "anna", "as-text");
 console.log(combinedName);
+//# sourceMappingURL=union-alias.js.map

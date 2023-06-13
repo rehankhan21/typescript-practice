@@ -13,5 +13,6 @@ if (typeof userInput === "string")
 function generateError(message, code) {
     throw { message: message, errorCode: code };
 }
-const result = generateError("error has occured", 500);
+//const result = generateError("error has occured", 500);
 //
+//# sourceMappingURL=unknownNever.js.map

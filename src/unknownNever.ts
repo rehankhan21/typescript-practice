@@ -15,5 +15,5 @@ function generateError(message: string, code: number): never {
   throw { message: message, errorCode: code };
 }
 
-const result = generateError("error has occured", 500);
+//const result = generateError("error has occured", 500);
 //
