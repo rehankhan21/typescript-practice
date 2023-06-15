@@ -17,3 +17,17 @@ const promise: Promise<string> = new Promise((resolve, reject) => {
 promise.then((data) => {
   data.split("");
 });
+
+// function merge<T, U>(objT: T, objB: U) {
+//   return Object.assign(objT, objB);
+// }
+
+// // type scrip infers the type of the parameters based on the type of the things you send
+// // as arguments
+// const mergedObj = merge({ name: "Max", hobbies: ["yo"] }, { age: 30 });
+
+// Type contraints
+// we guarentee that when this function is called, it receives 2 objects
+function merge<T extends object, U extends object>(objT: T, objB: U) {
+  return Object.assign(objT, objB);
+}
