@@ -27,4 +27,58 @@ promise.then((data) => {
 function merge(objT, objB) {
     return Object.assign(objT, objB);
 }
+// doesnt matter what type of data is being sent to this function
+// we made the interface to ensure we can call .length on our generic type T
+// ending ensures TS knows this function is returing a value of type T and string
+function countAndPrint(element) {
+    let descText = "no value";
+    if (element.length > 0) {
+        descText = "Got a value";
+    }
+    // Tuple
+    return [element, descText];
+}
+console.log(countAndPrint("ji there"));
+// key of Contraint
+// this is telling TS that U is going to be a key for the generic type of T
+// which T is an object
+function extractAndConvert(obj, key) {
+    return obj[key];
+}
+extractAndConvert({ name: "max" }, "name");
+// generic class
+// we create a generic class that can be intiated as any type
+class DataStorage {
+    constructor() {
+        this.data = [];
+    }
+    addItem(item) {
+        this.data.push(item);
+    }
+    removeItem(item) {
+        this.data.splice(this.data.indexOf(item), 1);
+    }
+    getItems() {
+        return [...this.data];
+    }
+}
+// we instiate an obj of DataStorage of type string
+const textStorage = new DataStorage();
+textStorage.addItem("yo");
+textStorage.addItem("no");
+textStorage.removeItem("yo");
+console.log(textStorage.getItems());
+const numberStorage = new DataStorage();
+function createGoal(title, desc) {
+    // turn this into a partial type so we can add the interface values later
+    let goal = {};
+    goal.title = title;
+    goal.desc = desc;
+    // convert partial goal back to goal using type casting to follow our return type
+    return goal;
+}
+// readonly type
+// makes sure the value can only be read but never changed
+const nam2es = ["uo", "oh"];
+//nam2es.push("man");
 //# sourceMappingURL=app.js.map
