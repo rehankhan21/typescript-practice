@@ -1,114 +1,94 @@
-// Generics / Generic Types
-// Array<T> syntax for generic types
-// specify the types that are gunna go in the array
-// this allows you to call string methods
-// array knows whjat data it will store
-const names: Array<string> = ["yo", "no"];
-names[0].split(" ");
+// Decorators - meta programming
 
-// promise knows what data it will return
-const promise: Promise<string> = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    resolve("this is done");
-  }, 2000);
-});
-
-// better type safety with generic types
-promise.then((data) => {
-  data.split("");
-});
-
-// function merge<T, U>(objT: T, objB: U) {
-//   return Object.assign(objT, objB);
-// }
-
-// // type scrip infers the type of the parameters based on the type of the things you send
-// // as arguments
-// const mergedObj = merge({ name: "Max", hobbies: ["yo"] }, { age: 30 });
-
-// Type contraints
-// we guarentee that when this function is called, it receives 2 objects
-function merge<T extends object, U extends object>(objT: T, objB: U) {
-  return Object.assign(objT, objB);
+// alot of decorators have functions with capital letters
+// factory function
+function Logger(logString: string) {
+  return function (constructor: Function) {
+    console.log(logString);
+    console.log(constructor);
+  };
 }
 
-interface lengthy {
-  length: number;
+// people can use our decarator functions as like a library
+// and use our decorator functions in their own program by using the @ sign
+function WithTemplate(template: string, hookId: string) {
+  return function (constructor: Function) {
+    console.log("template");
+    const hookEl = document.getElementById(hookId);
+    const p = new Person();
+    if (hookEl) {
+      hookEl.innerHTML = template;
+      hookEl.querySelector("h1")!.textContent = p.name;
+    }
+  };
 }
 
-// doesnt matter what type of data is being sent to this function
-// we made the interface to ensure we can call .length on our generic type T
-// ending ensures TS knows this function is returing a value of type T and string
-function countAndPrint<T extends lengthy>(element: T): [T, string] {
-  let descText = "no value";
-  if (element.length > 0) {
-    descText = "Got a value";
-  }
-  // Tuple
-  return [element, descText];
-}
+// Decorators can find your class even if you dont instatiante it
+// renders bottom up, with template goes first then  logger
+// creation of the decorator is top down, but the execution is bottom up
+@Logger("logging-person")
+@WithTemplate("<h1> my person object</h1>", "app")
+class Person {
+  name = "Max";
 
-console.log(countAndPrint("ji there"));
-
-// key of Contraint
-// this is telling TS that U is going to be a key for the generic type of T
-// which T is an object
-function extractAndConvert<T extends object, U extends keyof T>(
-  obj: T,
-  key: U
-) {
-  return obj[key];
-}
-
-extractAndConvert({ name: "max" }, "name");
-
-// generic class
-// we create a generic class that can be intiated as any type
-class DataStorage<T extends string | number | boolean> {
-  private data: T[] = [];
-
-  addItem(item: T) {
-    this.data.push(item);
-  }
-
-  removeItem(item: T) {
-    this.data.splice(this.data.indexOf(item), 1);
-  }
-
-  getItems() {
-    return [...this.data];
+  constructor() {
+    console.log("makiong person objext");
   }
 }
 
-// we instiate an obj of DataStorage of type string
-const textStorage = new DataStorage<string>();
-textStorage.addItem("yo");
-textStorage.addItem("no");
-textStorage.removeItem("yo");
-console.log(textStorage.getItems());
+const pers = new Person();
 
-const numberStorage = new DataStorage<number>();
+console.log(pers);
 
-//const objStorage = new DataStorage<object>();
+//---
 
-// Utilty Types
-// Partial Type
+function Log(target: any, propertyName: string | Symbol) {
+  console.log("property decorator");
+  console.log(target, propertyName);
+}
 
-interface Goal {
+function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
+  console.log("accessor decorator");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+function Log3(target: any, name: string, descriptor: PropertyDescriptor) {
+  console.log("method decorator");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+function Log4(target: any, name: string | Symbol, position: number) {
+  console.log("parameter decorator");
+  console.log(target);
+  console.log(name);
+  console.log(position);
+}
+
+class Product {
+  @Log
   title: string;
-  desc: string;
-}
+  private _price: number;
 
-function createGoal(title: string, desc: string): Goal {
-  // turn this into a partial type so we can add the interface values later
-  let goal: Partial<Goal> = {};
-  goal.title = title;
-  goal.desc = desc;
-  // convert partial goal back to goal using type casting to follow our return type
-  return goal as Goal;
-}
+  @Log2
+  set price(val: number) {
+    if (val > 0) {
+      this._price = val;
+    } else {
+      throw new Error("invalid price");
+    }
+  }
 
-// readonly type
-// makes sure the value can only be read but never changed
-const nam2es: Readonly<string[]> = ["uo", "oh"];
-//nam2es.push("man");
+  constructor(t: string, p: number) {
+    this.title = t;
+    this._price = p;
+  }
+
+  @Log3
+  getPriceWithTax(@Log4 tax: number) {
+    return this._price * (1 + tax);
+  }
+}
