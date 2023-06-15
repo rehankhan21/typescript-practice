@@ -20,14 +20,21 @@ function Logger(logString) {
 // people can use our decarator functions as like a library
 // and use our decorator functions in their own program by using the @ sign
 function WithTemplate(template, hookId) {
-    return function (constructor) {
-        console.log("template");
-        const hookEl = document.getElementById(hookId);
-        const p = new Person();
-        if (hookEl) {
-            hookEl.innerHTML = template;
-            hookEl.querySelector("h1").textContent = p.name;
-        }
+    return function (originalConstructor) {
+        return class extends originalConstructor {
+            constructor(..._) {
+                // this makes it so the decorater only gets rendered when the class is instiated
+                // when a class extends another class, we have to use the super keyword
+                super(); // this is the original class
+                // replaced it with the new custom class
+                console.log("template");
+                const hookEl = document.getElementById(hookId);
+                if (hookEl) {
+                    hookEl.innerHTML = template;
+                    hookEl.querySelector("h1").textContent = this.name;
+                }
+            }
+        };
     };
 }
 // Decorators can find your class even if you dont instatiante it
@@ -95,4 +102,32 @@ __decorate([
     Log3,
     __param(0, Log4)
 ], Product.prototype, "getPriceWithTax", null);
+// Log 2 and 3 can use whats returned by the decorator but Log 1 and 4 cant
+function Autobind(_, _2, descriptor) {
+    const originalMethod = descriptor.value;
+    const adjDescriptor = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            // this refers to watever is trigering the getter method
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        },
+    };
+    return adjDescriptor;
+}
+class Printer {
+    constructor() {
+        this.message = "this works";
+    }
+    showMessage() {
+        console.log(this.message);
+    }
+}
+__decorate([
+    Autobind
+], Printer.prototype, "showMessage", null);
+const p = new Printer();
+const button1 = document.querySelector("button");
+button1.addEventListener("click", p.showMessage);
 //# sourceMappingURL=app.js.map

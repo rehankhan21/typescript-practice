@@ -12,14 +12,23 @@ function Logger(logString: string) {
 // people can use our decarator functions as like a library
 // and use our decorator functions in their own program by using the @ sign
 function WithTemplate(template: string, hookId: string) {
-  return function (constructor: Function) {
-    console.log("template");
-    const hookEl = document.getElementById(hookId);
-    const p = new Person();
-    if (hookEl) {
-      hookEl.innerHTML = template;
-      hookEl.querySelector("h1")!.textContent = p.name;
-    }
+  return function <T extends { new (...args: any[]): { name: string } }>(
+    originalConstructor: T
+  ) {
+    return class extends originalConstructor {
+      constructor(..._: any[]) {
+        // this makes it so the decorater only gets rendered when the class is instiated
+        // when a class extends another class, we have to use the super keyword
+        super(); // this is the original class
+        // replaced it with the new custom class
+        console.log("template");
+        const hookEl = document.getElementById(hookId);
+        if (hookEl) {
+          hookEl.innerHTML = template;
+          hookEl.querySelector("h1")!.textContent = this.name;
+        }
+      }
+    };
   };
 }
 
@@ -92,3 +101,33 @@ class Product {
     return this._price * (1 + tax);
   }
 }
+// Log 2 and 3 can use whats returned by the decorator but Log 1 and 4 cant
+
+function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  const adjDescriptor: PropertyDescriptor = {
+    configurable: true,
+    enumerable: false,
+    get() {
+      // this refers to watever is trigering the getter method
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+
+  return adjDescriptor;
+}
+
+class Printer {
+  message = "this works";
+
+  @Autobind
+  showMessage() {
+    console.log(this.message);
+  }
+}
+
+const p = new Printer();
+
+const button1 = document.querySelector("button")!;
+button1.addEventListener("click", p.showMessage);
