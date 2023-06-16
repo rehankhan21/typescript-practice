@@ -103,6 +103,7 @@ __decorate([
     __param(0, Log4)
 ], Product.prototype, "getPriceWithTax", null);
 // Log 2 and 3 can use whats returned by the decorator but Log 1 and 4 cant
+// instead of calling .bind everywhere, just make a decortor instead
 function Autobind(_, _2, descriptor) {
     const originalMethod = descriptor.value;
     const adjDescriptor = {
@@ -130,4 +131,57 @@ __decorate([
 const p = new Printer();
 const button1 = document.querySelector("button");
 button1.addEventListener("click", p.showMessage);
+const registeredValidators = {};
+function Required1(target, propName) {
+    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: ["required"] });
+}
+function PositiveNumber(target, propName) {
+    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: ["positive"] });
+}
+function validate(obj) {
+    const objValidatorConfig = registeredValidators[obj.constructor.name];
+    if (!objValidatorConfig) {
+        return true;
+    }
+    let isValid = true;
+    for (const prop in objValidatorConfig) {
+        for (const validator of objValidatorConfig[prop]) {
+            switch (validator) {
+                case "required":
+                    isValid = isValid && !!obj[prop];
+                    break;
+                case "positive":
+                    isValid = isValid && obj[prop] > 0;
+                    break;
+            }
+        }
+    }
+    return isValid;
+}
+class Course {
+    constructor(t, p) {
+        this.title = t;
+        this.price = p;
+    }
+}
+__decorate([
+    Required1
+], Course.prototype, "title", void 0);
+__decorate([
+    PositiveNumber
+], Course.prototype, "price", void 0);
+const courseForm = document.querySelector("form");
+courseForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const titleEl = document.getElementById("title");
+    const priceEl = document.getElementById("price");
+    const title = titleEl.value;
+    const price = +priceEl.value;
+    const creastedCourse = new Course(title, price);
+    if (!validate(creastedCourse)) {
+        alert("invalid input");
+        return;
+    }
+    console.log(creastedCourse);
+});
 //# sourceMappingURL=app.js.map
